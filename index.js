@@ -22,26 +22,30 @@ function searchForTrack(track) {
     );
 }
 
-function checkExistingTrack(url) {
-    console.log(url);
-    fetch(url)
-        .then(res => res.json())
-        .then(json => console.log(json));
-    /**
-     * if (url.includes('youtube')) {
-        console.log(response.json());
+async function checkExistingTrack(url) {
+    let trackname = "";
+    if (url.includes('youtube')) {
+        url = `https://www.youtube.com/oembed?format=json&url=${url}`;
+        trackname = await fetch(url).then(res => res.json()).then(json => { return json.title });
+        console.log(trackname);
     }
     if (url.includes('spotify')) {
-        console.log(response.json());
+        const body = await fetch(url).then(res => res.text()).then(body => { return body });
+        xmlDoc = parser.parseFromString(body, "text/xml");
+        trackname = xmlDoc.getElementsByTagName('title');
+        console.log(trackname);
     }
     if (url.includes('soundcloud')) {
-        console.log(response.json());
+        url = `https://soundcloud.com/oembed?url=${url}&format=json`;
+        trackname = await fetch(url).then(res => res.json()).then(json => { return json.title });
+        console.log(trackname);
     }
     if (url.includes('deezer')) {
         console.log(response.json());
     }
-     */
-
+    if (url.includes('apple')) {
+        console.log(response.json());
+    }
     return null;
 }
 
