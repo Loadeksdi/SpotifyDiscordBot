@@ -5,7 +5,7 @@ const SpotifyWebApi = require('spotify-web-api-js');
 const spotifyApi = new SpotifyWebApi();
 const fetch = require('node-fetch');
 
-spotifyApi.setAccessToken('21a89f53cb3a4d1cb55f42bd996588dd');
+spotifyApi.setAccessToken(process.env.SPOTIFY_TOKEN);
 
 client.once('ready', () => {
     console.log('Ready!');
@@ -46,7 +46,7 @@ function checkExistingTrack(url) {
 }
 
 client.on('message', message => {
-    if (message.channel.id !== "763079789803470858") {
+    if (message.channel.id !== process.env.CHANNEL_ID) {
         return;
     }
     if (new RegExp("([a-zA-Z0-9]+://)?([a-zA-Z0-9_]+:[a-zA-Z0-9_]+@)?([a-zA-Z0-9.-]+\\.[A-Za-z]{2,4})(:[0-9]+)?(/.*)?").test(message.content)) {
@@ -55,4 +55,4 @@ client.on('message', message => {
     }
 });
 
-client.login('ODIwNDYwNjUwODY5ODE3MzU0.YE1fhg.H4DlubVU3MrZ1VhOhvYM72TMh-g');
+client.login(process.env.BOT_TOKEN);
