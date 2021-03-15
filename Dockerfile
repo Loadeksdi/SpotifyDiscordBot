@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY . /app/
 
-RUN npm install -g -s --no-progress yarn && \
-    yarn 
+RUN apk add --no-cache python make g++
+
+RUN yarn 
 
 CMD [ "node", "index.mjs" ]
