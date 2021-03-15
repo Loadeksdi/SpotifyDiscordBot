@@ -232,7 +232,7 @@ client.on('message', async (message) => {
         }
     }
     else {
-        message.channel.send(`Sorry <@${message.author.id}>, you exceeded your weekly quota of 5 tracks per week !`);
+        message.channel.send(`Sorry <@${message.author.id}>, you exceeded your weekly quota of 5 tracks!`);
         return;
     }
 });
