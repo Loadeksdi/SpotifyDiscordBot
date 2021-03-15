@@ -8,4 +8,4 @@ RUN rm -rf node_modules && yarn install --frozen-lockfile
 
 COPY . .
 
-CMD ["node","index.js"]
+CMD [ "node", "index.js"]
