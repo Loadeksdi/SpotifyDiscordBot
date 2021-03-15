@@ -1,11 +1,10 @@
-FROM node:6.9.5
+FROM node:15-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
+
+COPY . /app/
 
 RUN npm install -g -s --no-progress yarn && \
-    yarn && \
-    yarn run build && \
-    yarn run prune && \
-    yarn cache clean
+    yarn 
 
-CMD [ "npm", "start" ]
+CMD [ "node", "index.mjs" ]
