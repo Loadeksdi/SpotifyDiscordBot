@@ -105,7 +105,7 @@ function searchEmbed(tracks, title) {
 
 function helpEmbed() {
     const embed = new Discord.MessageEmbed().setAuthor('Dispotify', 'https://cdn.iconscout.com/icon/free/png-256/spotify-11-432546.png', 'https://github.com/Loadeksdi/SpotifyDiscordBot').setColor('#18d860').setDescription('I\'m a Discord bot that reads all messages on this channel and search on Spotify a corresponding track. I support the following platforms:');
-    embed.setThumbnail('./images/dispotify.png');
+    embed.setThumbnail('https://github.com/Loadeksdi/SpotifyDiscordBot/blob/main/images/dispotify.png?raw=true');
     embed.setTitle(`Hello, I\'m Dispotify`);
     embed.addField('Spotify', 'That seems kinda logical');
     embed.addField('YouTube', 'Let\'s not forget 99% of links');
