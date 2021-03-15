@@ -74,7 +74,6 @@ function read(name) {
             });
             schedule.scheduleJob(new Date(filePlaylist.date + parseInt(7)), weeklyReset);
         }
-        console.log(array);
     });
 }
 
@@ -105,14 +104,14 @@ function searchEmbed(tracks, title) {
 
 function helpEmbed() {
     const embed = new Discord.MessageEmbed().setAuthor('Dispotify', 'https://cdn.iconscout.com/icon/free/png-256/spotify-11-432546.png', 'https://github.com/Loadeksdi/SpotifyDiscordBot').setColor('#18d860').setDescription('I\'m a Discord bot that reads all messages on this channel and search on Spotify a corresponding track. I support the following platforms:');
-    embed.setThumbnail('https://github.com/Loadeksdi/SpotifyDiscordBot/blob/main/images/dispotify.png?raw=true');
+    embed.setThumbnail('https://raw.githubusercontent.com/Loadeksdi/SpotifyDiscordBot/main/images/dispotify.png');
     embed.setTitle(`Hello, I\'m Dispotify`);
     embed.addField('Spotify', 'That seems kinda logical');
     embed.addField('YouTube', 'Let\'s not forget 99% of links');
     embed.addField('Deezer', 'Why not ?');
     embed.addField('Soundcloud', 'For the 2017 rappers');
     embed.addField('~Apple Music', 'At least I try');
-    embed.setFooter('You can find my repository on Github by clicking on the Dispotify title');
+    embed.setFooter('You can find my repository on Github by clicking on the Dispotify title!');
     return embed;
 }
 
@@ -179,7 +178,6 @@ async function preCollectionActions(message, searchResult, embedMessage) {
     const filter = (reaction, user) => {
         return reactionEmojis.includes(reaction.emoji.name) && user.id === message.author.id;
     };
-
     const tracks = searchResult.body.tracks;
     const max = tracks.items.length < 5 ? tracks.items.length : 5;
     for (let i = 0; i < max; i++) {
