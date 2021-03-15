@@ -3,6 +3,8 @@
     "discord.js": "^12.5.1",
     "get-urls": "^10.0.0",
     "node-fetch": "^2.6.1",
-    "spotify-web-api-js": "^1.5.1"
+    "open-graph-scraper": "^4.8.1",
+    "spotify-web-api-node": "^5.0.2",
+    "valid-url": "^1.0.9"
   }
 }
