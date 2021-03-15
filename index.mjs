@@ -31,10 +31,11 @@ class User {
 
 class Playlist {
 
-    constructor(id) {
+    constructor(id, url) {
         this.id = id;
         this.date = Date.now();
         this.tracks = [];
+        this.url = url;
         weeklyPlaylist.push(this);
         write(weeklyPlaylist, 'playlist');
     }
@@ -64,12 +65,13 @@ function read(name) {
                 fileUser.counter = user.counter;
             });
         else {
+            let filePlaylist;
             array.forEach(playlist => {
-                const filePlaylist = new Playlist(playlist.id);
+                filePlaylist = new Playlist(playlist.id);
                 filePlaylist.date = playlist.date;
                 filePlaylist.tracks = playlist.tracks;
+                filePlaylist.url = playlist.url;
             });
-            //to check/fix
             schedule.scheduleJob(new Date(filePlaylist.date + parseInt(7)), weeklyReset);
         }
         console.log(array);
@@ -91,7 +93,6 @@ function searchEmbed(tracks, title) {
         const max = tracks.items.length < 5 ? tracks.items.length : 5;
         for (let i = 0; i < max; i++) {
             let artistsName = '';
-            // fix ??
             tracks.items[i].artists.forEach(artist => {
                 artistsName += artist.name + ' ';
             });
@@ -104,6 +105,7 @@ function searchEmbed(tracks, title) {
 
 function helpEmbed() {
     const embed = new Discord.MessageEmbed().setAuthor('Dispotify', 'https://cdn.iconscout.com/icon/free/png-256/spotify-11-432546.png', 'https://github.com/Loadeksdi/SpotifyDiscordBot').setColor('#18d860').setDescription('I\'m a Discord bot that reads all messages on this channel and search on Spotify a corresponding track. I support the following platforms:');
+    embed.setThumbnail('./images/dispotify.png');
     embed.setTitle(`Hello, I\'m Dispotify`);
     embed.addField('Spotify', 'That seems kinda logical');
     embed.addField('YouTube', 'Let\'s not forget 99% of links');
@@ -148,24 +150,29 @@ async function weeklyReset() {
 }
 
 async function addTrackToPlaylist(trackid, message) {
-    const playlistName = `${message.guild.name}'s weekly playlist`;
-    const searchPlaylist = await spotifyApi.searchPlaylists(playlistName);
-    let playlistObject;
-    let searchPlaylistBody = searchPlaylist.body;
-    let playlist = searchPlaylistBody.playlists.items[0];
-    if (searchPlaylistBody.playlists.items.length === 0) {
-        playlist = await spotifyApi.createPlaylist(`${message.guild.name}'s weekly playlist `, { 'description': `An auto-generated playlist made for ${message.guild.name}'s Discord server from ${new Date(Date.now()).toLocaleString('en-US')} to ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleString('en-US')}.`, 'public': true });
+    if (weeklyPlaylist.length === 0) {
+        const newPlaylist = await spotifyApi.createPlaylist(`${message.guild.name}'s weekly playlist`, { 'description': `An auto-generated playlist made for ${message.guild.name}'s Discord server from ${new Date(Date.now()).toLocaleString('en-US')} to ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleString('en-US')}.`, 'public': true });
+        const playlistObject = new Playlist(newPlaylist.body.id, newPlaylist.body.external_urls.spotify);
         const imageBuffer = await (await fetch(message.guild.iconURL({ format: 'jpeg' }))).buffer();
         const base64 = imageBuffer.toString('base64');
-        await spotifyApi.uploadCustomPlaylistCoverImage(playlist.body.id, base64);
-        playlistObject = new Playlist(playlist.body.id);
+        await spotifyApi.uploadCustomPlaylistCoverImage(newPlaylist.body.id, base64);
         schedule.scheduleJob(new Date(playlistObject.date + parseInt(7)), weeklyReset);
     }
-    // to fix
-    await spotifyApi.addTracksToPlaylist(playlist.body.id, [`spotify:track:${trackid}`]);
-    playlistObject.tracks.push({ uri: `spotify:track:${trackid}` });
+    const currentPlaylist = weeklyPlaylist[0];
+    let inPlaylist = false;
+    currentPlaylist.tracks.forEach(track => {
+        if (track.uri === `spotify:track:${trackid}`) {
+            inPlaylist = true;
+        }
+    });
+    if (inPlaylist) {
+        message.channel.send(`Sorry, <@${message.author.id}> this track is already in the playlist!`);
+        return;
+    }
+    await spotifyApi.addTracksToPlaylist(currentPlaylist.id, [`spotify:track:${trackid}`]);
+    currentPlaylist.tracks.push({ uri: `spotify:track:${trackid}` });
+    await message.channel.send(`Thanks to <@${message.author.id}>, the track has been added to the weekly playlist: <${currentPlaylist.url}>`);
     write(weeklyPlaylist, 'playlist');
-    await message.channel.send(`Thanks to ${message.author.username}, the track has been added to the weekly playlist: ${playlist.body.external_urls.spotify}`);
 }
 
 async function preCollectionActions(message, searchResult, embedMessage) {
@@ -174,12 +181,11 @@ async function preCollectionActions(message, searchResult, embedMessage) {
     };
 
     const tracks = searchResult.body.tracks;
-    const max = tracks.items.size < 5 ? tracks.items.size : 5;
+    const max = tracks.items.length < 5 ? tracks.items.length : 5;
     for (let i = 0; i < max; i++) {
         await embedMessage.react(reactionEmojis[i]);
     }
     const collector = embedMessage.createReactionCollector(filter, { max: 1, time: 60000 });
-
     async function postCollectionActions(index, user) {
         await embedMessage.reactions.removeAll();
         const trackid = tracks.items[index].id;
@@ -190,7 +196,6 @@ async function preCollectionActions(message, searchResult, embedMessage) {
         currentUser.counter++;
         write(users, 'users');
         await addTrackToPlaylist(trackid, message);
-
     };
 
     collector.on('collect', (reaction, user) => {
