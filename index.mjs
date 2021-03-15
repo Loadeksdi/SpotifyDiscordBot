@@ -225,15 +225,15 @@ client.on('message', async (message) => {
                 };
                 preCollectionActions(message, searchResult, embedMessage);
             }
-            else {
-                message.channel.send(`Sorry <@${message.author.id}>, you exceeded your weekly quota of 5 tracks per week !`);
-                return;
-            }
         }
         catch (err) {
             console.error(err);
             message.channel.send('Error, invalid request');
         }
+    }
+    else {
+        message.channel.send(`Sorry <@${message.author.id}>, you exceeded your weekly quota of 5 tracks per week !`);
+        return;
     }
 });
 
