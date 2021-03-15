@@ -42,7 +42,7 @@ class Playlist {
 }
 
 function write(data, name) {
-    fs.writeFile(`${name}.json`, JSON.stringify(data, null, 4), (err) => {
+    fs.writeFile(`data/${name}.json`, JSON.stringify(data, null, 4), (err) => {
         if (err) {
             return;
         }
@@ -51,7 +51,7 @@ function write(data, name) {
 }
 
 function read(name) {
-    fs.readFile(`${name}.json`, 'utf-8', (err, data) => {
+    fs.readFile(`data/${name}.json`, 'utf-8', (err, data) => {
         if (err) {
             return;
         }
@@ -117,7 +117,7 @@ function helpEmbed() {
 
 client.once('ready', () => {
     console.log('Ready!');
-    if (fs.existsSync("./users.json")) {
+    if (fs.existsSync("data/users.json")) {
         read('users');
         read('playlist');
     } else {
@@ -211,22 +211,28 @@ client.on('message', async (message) => {
         const urls = getUrls(message.content);
         let embedMessage;
         let searchResult;
-        if (urls.size === 0) {
-            searchResult = await searchForTrack(message.content);
-            embedMessage = await message.channel.send(searchEmbed(searchResult.body.tracks, message.content));
-            preCollectionActions(message, searchResult, embedMessage);
+        try {
+            if (urls.size === 0) {
+                searchResult = await searchForTrack(message.content);
+                embedMessage = await message.channel.send(searchEmbed(searchResult.body.tracks, message.content));
+                preCollectionActions(message, searchResult, embedMessage);
+            }
+            else if (urls.size === 1) {
+                const trackNames = await Promise.all([...urls].map(url => checkExistingTrack(url)));
+                for (const track of trackNames) {
+                    searchResult = await searchForTrack(track.result.ogTitle);
+                    embedMessage = await message.channel.send(searchEmbed(searchResult.body.tracks, track.result.ogTitle));
+                };
+                preCollectionActions(message, searchResult, embedMessage);
+            }
+            else {
+                message.channel.send(`Sorry <@${message.author.id}>, you exceeded your weekly quota of 5 tracks per week !`);
+                return;
+            }
         }
-        else if (urls.size === 1) {
-            const trackNames = await Promise.all([...urls].map(url => checkExistingTrack(url)));
-            for (const track of trackNames) {
-                searchResult = await searchForTrack(track.result.ogTitle);
-                embedMessage = await message.channel.send(searchEmbed(searchResult.body.tracks, track.result.ogTitle));
-            };
-            preCollectionActions(message, searchResult, embedMessage);
-        }
-        else {
-            message.channel.send(`Sorry <@${message.author.id}>, you exceeded your weekly quota of 5 tracks per week !`);
-            return;
+        catch (err) {
+            console.error(err);
+            message.channel.send('Error, invalid request');
         }
     }
 });
