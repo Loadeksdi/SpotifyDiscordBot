@@ -1,11 +1,11 @@
-FROM node:15-alpine
+FROM node:6.9.5
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+RUN npm install -g -s --no-progress yarn && \
+    yarn && \
+    yarn run build && \
+    yarn run prune && \
+    yarn cache clean
 
-RUN rm -rf node_modules && yarn install --frozen-lockfile
-
-COPY . .
-
-CMD [ "node", "index.js"]
+CMD [ "npm", "start" ]
