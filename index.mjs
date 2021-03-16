@@ -229,6 +229,9 @@ client.on('message', async (message) => {
         catch (err) {
             console.error(err);
             message.channel.send('Error, invalid request');
+            if (err.status_code = 401) {
+                await refreshAccessToken();
+            }
         }
     }
     else {
