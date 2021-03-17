@@ -127,7 +127,16 @@ client.once('ready', () => {
 });
 
 async function searchForTrack(track) {
-    return await spotifyApi.searchTracks(track);
+    let foundTrack;
+    try {
+        foundTrack = await spotifyApi.searchTracks(track);
+    } catch (err) {
+        if (err.body.status_code = 401) {
+            await refreshAccessToken();
+            foundTrack = await spotifyApi.searchTracks(track);
+        }
+    }
+    return foundTrack;
 }
 
 async function checkExistingTrack(url) {
@@ -229,9 +238,6 @@ client.on('message', async (message) => {
         catch (err) {
             console.error(err);
             message.channel.send('Error, invalid request');
-            if (err.body.status_code = 401) {
-                await refreshAccessToken();
-            }
         }
     }
     else {
