@@ -103,7 +103,7 @@ function searchEmbed(tracks, title) {
 }
 
 function helpEmbed() {
-    const embed = new Discord.MessageEmbed().setAuthor('Dispotify', 'https://cdn.iconscout.com/icon/free/png-256/spotify-11-432546.png', 'https://github.com/Loadeksdi/SpotifyDiscordBot').setColor('#18d860').setDescription('I\'m a Discord bot that reads all messages on this channel and search on Spotify a corresponding track. I support the following platforms:');
+    const embed = new Discord.MessageEmbed().setAuthor('Dispotify', 'https://cdn.iconscout.com/icon/free/png-256/spotify-11-432546.png', 'https://github.com/Loadeksdi/SpotifyDiscordBot').setColor('#18d860').setDescription('I\'m a Discord bot that reads all messages on this channel and searches a corresponding track on Spotify. I support the following platforms:');
     embed.setThumbnail('https://raw.githubusercontent.com/Loadeksdi/SpotifyDiscordBot/main/images/dispotify.png');
     embed.setTitle(`Hello, I\'m Dispotify`);
     embed.addField('Spotify', 'That seems kinda logical');
