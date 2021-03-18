@@ -8,7 +8,6 @@ import schedule from 'node-schedule';
 import fs from 'fs';
 const client = new Discord.Client();
 
-let ACCESS_TOKEN;
 let users = [];
 let weeklyPlaylist = [];
 const reactionEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣'];
@@ -255,9 +254,8 @@ async function refreshAccessToken() {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': `Basic ${encodedCredentials}` }
     });
     const resBody = await res.json();
-    ACCESS_TOKEN = resBody.access_token;
+    spotifyApi.setAccessToken(resBody.access_token);
 }
 
 await refreshAccessToken();
-spotifyApi.setAccessToken(ACCESS_TOKEN);
 client.login(process.env.BOT_TOKEN);
