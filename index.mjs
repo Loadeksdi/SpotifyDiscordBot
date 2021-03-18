@@ -131,7 +131,7 @@ async function searchForTrack(track) {
     try {
         foundTrack = await spotifyApi.searchTracks(track);
     } catch (err) {
-        if (err.body.status_code = 401) {
+        if (err.body.status_code === 401) {
             await refreshAccessToken();
             foundTrack = await spotifyApi.searchTracks(track);
         }
