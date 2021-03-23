@@ -159,7 +159,7 @@ async function weeklyReset() {
 
 async function addTrackToPlaylist(trackid, message) {
     if (weeklyPlaylist.length === 0) {
-        const newPlaylist = await spotifyApi.createPlaylist(`${message.guild.name}'s weekly playlist`, { 'description': `An auto-generated playlist made for ${message.guild.name}'s Discord server from ${new Date(Date.now()).toLocaleString('en-US')} to ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleString('en-US')}.`, 'public': true });
+        const newPlaylist = await spotifyApi.createPlaylist(`${message.guild.name}'s weekly playlist`, { 'description': `An auto-generated playlist made for ${message.guild.name}'s Discord server from ${new Date(Date.now()).toLocaleString('en-US')} to ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleString('en-US')}.`, 'public': false });
         const playlistObject = new Playlist(newPlaylist.body.id, newPlaylist.body.external_urls.spotify);
         const imageBuffer = await (await fetch(message.guild.iconURL({ format: 'jpeg' }))).buffer();
         const base64 = imageBuffer.toString('base64');
@@ -222,9 +222,11 @@ client.on('message', async (message) => {
         let searchResult;
         try {
             if (urls.size === 0) {
-                searchResult = await searchForTrack(message.content);
-                embedMessage = await message.channel.send(searchEmbed(searchResult.body.tracks, message.content));
-                preCollectionActions(message, searchResult, embedMessage);
+                if (message.content.length < 80) {
+                    searchResult = await searchForTrack(message.content);
+                    embedMessage = await message.channel.send(searchEmbed(searchResult.body.tracks, message.content));
+                    preCollectionActions(message, searchResult, embedMessage);
+                }
             }
             else if (urls.size === 1) {
                 const trackNames = await Promise.all([...urls].map(url => checkExistingTrack(url)));
